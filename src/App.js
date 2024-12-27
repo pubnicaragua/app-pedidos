@@ -11,6 +11,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Carrito from './pages/Carrito';
 import CreateProduct from './components/CreateProduct';
+import Search from './pages/Search';
 
 const categories = [
   { name: 'Restaurantes', slug: 'restaurantes', image: '/placeholder.svg?height=200&width=300' },
@@ -56,7 +57,9 @@ function App() {
           
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          
           <Route path="/carrito" element={<Carrito />} />
+          <Route path="/search" element={<Search />} />
 
           <Route path="/admin/productos/crear" element={<CreateProduct />} />
         </Routes>
