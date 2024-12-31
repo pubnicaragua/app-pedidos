@@ -1,6 +1,7 @@
 // src/components/Login.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import supabase from '../api/supabase';  // Importa tu cliente Supabase
 
 const Login = () => {
   const navigate = useNavigate();
@@ -30,10 +31,26 @@ const Login = () => {
       return;
     }
 
-    // Aquí es donde puedes integrar la lógica para autenticar al usuario (por ejemplo, con una API)
-    // Si el inicio de sesión es exitoso, redirigimos al usuario a su dashboard o página principal
+    // Limpia el error antes de intentar iniciar sesión
     setError('');
-    navigate('/dashboard'); // Redirige al dashboard u otra página después de un login exitoso
+
+    try {
+      // Usar Supabase para autenticar al usuario
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (error) {
+        setError(error.message);  // Muestra el mensaje de error de Supabase
+      } else {
+        // Si la autenticación es exitosa, redirige al usuario
+        navigate('/');  // Cambia esta URL si tienes otro destino
+      }
+    } catch (error) {
+      setError('Ocurrió un error, intenta nuevamente.');
+      console.error(error);
+    }
   };
 
   return (
