@@ -46,7 +46,7 @@ export default function Header() {
 
     // Verificamos si el usuario está disponible y si tiene un rol asignado
     if (!user) {
-      navigate('/login');
+      navigate('/register');
     } else if (!role) {
       navigate('/completar-perfil');
     } else if (role === 2) {
