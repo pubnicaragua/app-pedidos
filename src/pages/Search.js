@@ -1,60 +1,80 @@
-import { useState } from 'react';
-import { SearchHeader } from "../components/SearchHeader"
-import { SearchFilters } from "../components/SearchFilters"
-import { ProductCard } from "../components/ProductCard"
-import { RestaurantCard } from "../components/RestaurantCard"
-import { CategoriesSidebar } from "../components/CategoriesSidebar"
-import { CartModal } from "../components/CartModal"
-import { CartSummary } from "../components/CartSummary"
-import { Input } from "../components/Input"
-import { Button } from "../components/Button"
-import { X } from 'lucide-react'
+import { useEffect, useState } from 'react';
+import { addToCart, updateCartItemQuantity, removeFromCart } from '../api/cartFunctions';
+
+import { SearchHeader } from "../components/SearchHeader";
+import { SearchFilters } from "../components/SearchFilters";
+import { ProductCard } from "../components/ProductCard";
+import { RestaurantCard } from "../components/RestaurantCard";
+import { CategoriesSidebar } from "../components/CategoriesSidebar";
+import { CartModal } from "../components/CartModal";
+import { CartSummary } from "../components/CartSummary";
+import supabase from '../api/supabase'; // Asegúrate de que tienes supabase correctamente configurado
 
 export default function SearchPage() {
   const [selectedStore, setSelectedStore] = useState(null);
+  const [restaurants, setRestaurants] = useState([]); // Estado para los restaurantes
+  const [products, setProducts] = useState([]); // Estado para los productos de la tienda seleccionada
   const [cart, setCart] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(1); // Estado para la cantidad
+  const [error, setError] = useState(null);
 
-  const restaurants = [
-    {
-      name: "Fiero Pizza",
-      image: "/placeholder.svg?height=96&width=96",
-      deliveryTime: "45-65 min",
-      deliveryFee: "NaN",
-      rating: 4.5,
-      sponsored: true,
-      products: [
-        { name: "Pizza Margarita", price: 120, image: "/placeholder.svg" },
-        { name: "Pizza Pepperoni", price: 150, image: "/placeholder.svg" },
-      ],
-    },
-    {
-      name: "Entre Amigos - Los Robles",
-      image: "/placeholder.svg?height=96&width=96",
-      deliveryTime: "45-65 min",
-      deliveryFee: "NaN",
-      rating: 5.0,
-      sponsored: true,
-      isNew: true,
-      products: [
-        { name: "Tacos al Pastor", price: 100, image: "/placeholder.svg" },
-        { name: "Burritos", price: 130, image: "/placeholder.svg" },
-      ],
-    },
-    {
-      name: "Little Caesars Gran Vía",
-      image: "/placeholder.svg?height=96&width=96",
-      deliveryTime: "40-60 min",
-      deliveryFee: "NaN",
-      rating: 4.6,
-      sponsored: true,
-      products: [
-        { name: "Pizza de 4 Quesos", price: 140, image: "/placeholder.svg" },
-        { name: "Pizza Hawaiana", price: 160, image: "/placeholder.svg" },
-      ],
-    },
-  ];
+  // Fetch restaurants from Supabase
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('tienda')
+          .select('id, nombre, logo, imagen_fondo, precio_envio, calificacion')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // Elimina duplicados de la lista de restaurantes
+        setRestaurants((prevRestaurants) => {
+          const uniqueRestaurants = [...prevRestaurants, ...data].filter(
+            (value, index, self) =>
+              index === self.findIndex((t) => t.id === value.id)
+          );
+          return uniqueRestaurants;
+        });
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRestaurants();
+  }, []); // Solo se ejecuta al cargar el componente
+
+  // Fetch products when a store is selected
+  useEffect(() => {
+    if (selectedStore) {
+      const fetchProducts = async () => {
+        try {
+          setLoading(true);
+          const { data, error } = await supabase
+            .from('productos')
+            .select('id, nombre, imagen, precio')
+            .eq('tienda_id', selectedStore.id);  // Filtra por el id de la tienda seleccionada
+
+          if (error) throw error;
+
+          setProducts(data); // Guarda los productos obtenidos en el estado
+        } catch (error) {
+          setError(error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchProducts();
+    }
+  }, [selectedStore]); // Solo se ejecuta cuando se selecciona una tienda
 
   const handleStoreClick = (store) => {
     setSelectedStore(store);
@@ -66,93 +86,95 @@ export default function SearchPage() {
   };
 
   const handleAddToCart = (product) => {
-    setCart((prevCart) => [...prevCart, product]);  // Actualiza el carrito con el nuevo producto
-    setIsModalOpen(false);  // Cierra el modal después de agregar al carrito
+    // Revisamos si el producto ya está en el carrito
+    const existingProductIndex = cart.findIndex(item => item.id === product.id);
+
+    if (existingProductIndex !== -1) {
+      // Si ya está, actualizamos la cantidad
+      const updatedCart = [...cart];
+      updatedCart[existingProductIndex].cantidad += quantity;  // Aumentamos la cantidad
+      setCart(updatedCart);
+    } else {
+      // Si no está, lo agregamos al carrito con la cantidad seleccionada
+      setCart([...cart, { ...product, cantidad: quantity }]);
+    }
+    setIsModalOpen(false); // Cerrar el modal
   };
+
 
   const handleContinue = () => {
     console.log('Continuar con la compra');
   };
 
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <SearchHeader />
-
       <main className="container mx-auto px-4 py-6">
-        <div className="flex items-center gap-4 mb-6 justify-center">
-          <div className="flex gap-1 flex-1 max-w-xl relative items-center">
-            <Input
-              type="search"
-              placeholder="Buscar"
-              defaultValue="pizza"
-              className="pr-10 w-full"
-            />
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute right-2 top-1/2 -translate-y-1/2"
-            >
-              <div className="flex items-center ">
-                <X className="h-4 w-4" />
-                <span className="ml-2">Cerrar</span>
-              </div>
-            </Button>
-          </div>
-        </div>
-
-
-
         <div className="flex gap-6">
           <SearchFilters />
 
           <div className="flex-1">
             {selectedStore ? (
               <div>
-                <h2 className="text-lg font-semibold mb-4">{selectedStore.name}</h2>
+                <button
+                  onClick={() => setSelectedStore(null)}
+                  className="mb-4 p-2 bg-blue-500 text-white rounded"
+                >
+                  Volver a las tiendas
+                </button>
+                <h2 className="text-lg font-semibold mb-4">{selectedStore.nombre}</h2>
                 <div className="space-y-4">
-                  {selectedStore.products.map((product) => (
-                    <div
-                      key={product.name}
-                      onClick={() => handleOpenModal(product)}
-                    >
-                      <ProductCard product={product} />
-                    </div>
-                  ))}
+                  {/* Verificamos que los productos estén disponibles */}
+                  {products && products.length > 0 ? (
+                    products.map((product) => (
+                      <div key={product.id} onClick={() => handleOpenModal(product)}>
+                        <ProductCard product={product} />
+                      </div>
+                    ))
+                  ) : (
+                    <div>No hay productos disponibles.</div>
+                  )}
                 </div>
               </div>
             ) : (
               <div>
-                <h2 className="text-lg font-semibold mb-4">43 Resultados</h2>
+                <h2 className="text-lg font-semibold mb-4">Restaurantes</h2>
                 <div className="space-y-4">
+                  {/* Renderizamos la lista de restaurantes */}
                   {restaurants.map((restaurant) => (
-                    <div
-                      key={restaurant.name}
-                      onClick={() => handleStoreClick(restaurant)}
-                    >
+                    <div key={restaurant.id} onClick={() => handleStoreClick(restaurant)}>
                       <RestaurantCard restaurant={restaurant} />
                     </div>
                   ))}
                 </div>
               </div>
             )}
+
           </div>
 
           <div className="w-72">
-            {/* Carrito */}
             <CartSummary cart={cart} onContinue={handleContinue} />
             <CategoriesSidebar />
           </div>
-
         </div>
       </main>
 
-      {/* Modal para agregar al carrito */}
       <CartModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         product={selectedProduct}
+        quantity={quantity}  // Pasamos la cantidad
+        setQuantity={setQuantity}  // Pasamos la función para cambiar la cantidad
         onAddToCart={handleAddToCart}
       />
+
     </div>
   );
 }

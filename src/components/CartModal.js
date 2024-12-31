@@ -1,30 +1,25 @@
-import { useState } from 'react';
-import { X } from 'lucide-react';
-
-export function CartModal({ isOpen, onClose, product, onAddToCart }) {
-  const [quantity, setQuantity] = useState(1);
-
-  if (!isOpen) return null;  // Si no está abierto, no renderizamos el modal
+export function CartModal({ isOpen, onClose, product, quantity, setQuantity, onAddToCart }) {
+  if (!isOpen) return null;
 
   const handleAddToCart = () => {
-    onAddToCart({ ...product, quantity }); // Agrega el producto al carrito
-    onClose();  // Cierra el modal después de agregar al carrito
+    onAddToCart(product, quantity);  // Ahora usamos la función addToCart que pasamos como prop
+    onClose();  // Cerramos el modal después de agregar al carrito
   };
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg w-96">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-lg text-black">{product.name}</h3>
+          <h3 className="font-semibold text-lg text-black">{product.nombre}</h3>
           <button
             className="bg-transparent border-none text-black text-lg"
             onClick={onClose}
           >
-            <X className="h-5 w-5" />
+            <p className="h-5 w-5" aria-hidden="true">x</p>
           </button>
         </div>
         <div className="mb-4">
-          <p className="text-sm text-gray-600">Precio: C${product.price}</p>
+          <p className="text-sm text-gray-600">Precio: C${product.precio}</p>
         </div>
         <div className="mb-4 flex items-center gap-4">
           <button

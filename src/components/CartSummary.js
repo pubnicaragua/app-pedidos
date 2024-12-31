@@ -1,13 +1,5 @@
-import { Button } from "./Button";
-import { useNavigate } from "react-router-dom";
-
-export function CartSummary({ cart }) {
-  const navigate = useNavigate();
-
-  const handleContinue = () => {
-    // Redirige a la página del carrito y pasa los datos del carrito como state
-    navigate('/carrito', { state: { cart } });
-  };
+export function CartSummary({ cart, onContinue }) {
+  const total = cart.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
 
   return (
     <div className="bg-white p-4 shadow-lg rounded-lg mb-6">
@@ -18,18 +10,21 @@ export function CartSummary({ cart }) {
         ) : (
           cart.map((item, index) => (
             <div key={index} className="flex justify-between items-center">
-              <span>{item.name} x{item.quantity}</span>
-              <span>C${item.price * item.quantity}</span>
+              <span>{item.nombre} x{item.cantidad}</span>
+              <span>C${item.precio * item.cantidad}</span>
             </div>
           ))
         )}
       </div>
       <div className="mt-4">
-  <button onClick={handleContinue} className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
-    Continuar
-  </button>
-</div>
-
+        <p className="text-lg font-semibold">Total: C${total}</p>
+        <button
+          onClick={onContinue}
+          className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+        >
+          Continuar
+        </button>
+      </div>
     </div>
   );
 }
