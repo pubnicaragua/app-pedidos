@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button } from './Button';
 import { Input } from './Input';
 import { Search } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import supabase from '../api/supabase';
 
 export default function Header() {
@@ -76,7 +76,9 @@ export default function Header() {
     <header className="bg-white shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
-          <div className="text-2xl font-bold text-pink-600">AppPedidos</div>
+          <Link to="/">
+            <div className="text-2xl font-bold text-pink-600">AppPedidos</div>
+          </Link>
 
           {/* Menú móvil */}
           <div className="md:hidden flex items-center">
