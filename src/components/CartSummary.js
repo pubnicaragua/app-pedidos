@@ -20,6 +20,7 @@ export function CartSummary({ cart, onContinue }) {
         <p className="text-lg font-semibold">Total: C${total}</p>
         <button
           onClick={onContinue}
+          navigate="/carrito"
           className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
         >
           Continuar

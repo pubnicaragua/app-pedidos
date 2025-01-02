@@ -1,46 +1,41 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { addToCart, updateCartItemQuantity, removeFromCart } from '../api/cartFunctions';
 
-import { SearchHeader } from "../components/SearchHeader";
-import { SearchFilters } from "../components/SearchFilters";
-import { ProductCard } from "../components/ProductCard";
-import { RestaurantCard } from "../components/RestaurantCard";
-import { CategoriesSidebar } from "../components/CategoriesSidebar";
-import { CartModal } from "../components/CartModal";
-import { CartSummary } from "../components/CartSummary";
+import { SearchFilters } from "./SearchFilters";
+import { ProductCard } from "./ProductCard";
+import { RestaurantCard } from "./RestaurantCard";
+import { CategoriesSidebar } from "./CategoriesSidebar";
+import { CartModal } from "./CartModal";
+import { CartSummary } from "./CartSummary";
 import supabase from '../api/supabase'; // Asegúrate de que tienes supabase correctamente configurado
 
 export default function SearchPage() {
   const [selectedStore, setSelectedStore] = useState(null);
-  const [restaurants, setRestaurants] = useState([]); // Estado para los restaurantes
-  const [products, setProducts] = useState([]); // Estado para los productos de la tienda seleccionada
+  const [restaurants, setRestaurants] = useState([]);
+  const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [quantity, setQuantity] = useState(1); // Estado para la cantidad
+  const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState(null);
 
-  // Fetch restaurants from Supabase
+  const location = useLocation();
+  const query = new URLSearchParams(location.search).get('query');
+
   useEffect(() => {
-    const fetchRestaurants = async () => {
+    const fetchStores = async () => {
       try {
         setLoading(true);
+
         const { data, error } = await supabase
-          .from('tienda')
-          .select('id, nombre, logo, imagen_fondo, precio_envio, calificacion')
-          .order('created_at', { ascending: false });
+          .rpc('search_stores_by_category', { query })
+          .select('*');
 
         if (error) throw error;
 
-        // Elimina duplicados de la lista de restaurantes
-        setRestaurants((prevRestaurants) => {
-          const uniqueRestaurants = [...prevRestaurants, ...data].filter(
-            (value, index, self) =>
-              index === self.findIndex((t) => t.id === value.id)
-          );
-          return uniqueRestaurants;
-        });
+        setRestaurants(data);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -48,10 +43,11 @@ export default function SearchPage() {
       }
     };
 
-    fetchRestaurants();
-  }, []); // Solo se ejecuta al cargar el componente
+    if (query) {
+      fetchStores();
+    }
+  }, [query]);
 
-  // Fetch products when a store is selected
   useEffect(() => {
     if (selectedStore) {
       const fetchProducts = async () => {
@@ -60,11 +56,11 @@ export default function SearchPage() {
           const { data, error } = await supabase
             .from('productos')
             .select('id, nombre, imagen, precio')
-            .eq('tienda_id', selectedStore.id);  // Filtra por el id de la tienda seleccionada
+            .eq('tienda_id', selectedStore.id);
 
           if (error) throw error;
 
-          setProducts(data); // Guarda los productos obtenidos en el estado
+          setProducts(data);
         } catch (error) {
           setError(error.message);
         } finally {
@@ -74,7 +70,7 @@ export default function SearchPage() {
 
       fetchProducts();
     }
-  }, [selectedStore]); // Solo se ejecuta cuando se selecciona una tienda
+  }, [selectedStore]);
 
   const handleStoreClick = (store) => {
     setSelectedStore(store);
@@ -86,21 +82,17 @@ export default function SearchPage() {
   };
 
   const handleAddToCart = (product) => {
-    // Revisamos si el producto ya está en el carrito
     const existingProductIndex = cart.findIndex(item => item.id === product.id);
 
     if (existingProductIndex !== -1) {
-      // Si ya está, actualizamos la cantidad
       const updatedCart = [...cart];
-      updatedCart[existingProductIndex].cantidad += quantity;  // Aumentamos la cantidad
+      updatedCart[existingProductIndex].cantidad += quantity;
       setCart(updatedCart);
     } else {
-      // Si no está, lo agregamos al carrito con la cantidad seleccionada
       setCart([...cart, { ...product, cantidad: quantity }]);
     }
-    setIsModalOpen(false); // Cerrar el modal
+    setIsModalOpen(false);
   };
-
 
   const handleContinue = () => {
     console.log('Continuar con la compra');
@@ -117,9 +109,13 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="container mx-auto px-4 py-6">
-        <div className="flex gap-6">
-          <SearchFilters />
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Filtros de búsqueda en móviles y tabletas */}
+          <div className="md:w-1/4 mb-6 md:mb-0">
+            <SearchFilters />
+          </div>
 
+          {/* Contenido principal */}
           <div className="flex-1">
             {selectedStore ? (
               <div>
@@ -131,7 +127,7 @@ export default function SearchPage() {
                 </button>
                 <h2 className="text-lg font-semibold mb-4">{selectedStore.nombre}</h2>
                 <div className="space-y-4">
-                  {/* Verificamos que los productos estén disponibles */}
+                  {/* Mostrar productos de la tienda seleccionada */}
                   {products && products.length > 0 ? (
                     products.map((product) => (
                       <div key={product.id} onClick={() => handleOpenModal(product)}>
@@ -147,7 +143,7 @@ export default function SearchPage() {
               <div>
                 <h2 className="text-lg font-semibold mb-4">Restaurantes</h2>
                 <div className="space-y-4">
-                  {/* Renderizamos la lista de restaurantes */}
+                  {/* Mostrar restaurantes */}
                   {restaurants.map((restaurant) => (
                     <div key={restaurant.id} onClick={() => handleStoreClick(restaurant)}>
                       <RestaurantCard restaurant={restaurant} />
@@ -156,25 +152,25 @@ export default function SearchPage() {
                 </div>
               </div>
             )}
-
           </div>
 
-          <div className="w-72">
+          {/* Sidebar con resumen del carrito */}
+          <div className="w-full md:w-72 mt-6 md:mt-0">
             <CartSummary cart={cart} onContinue={handleContinue} />
             <CategoriesSidebar />
           </div>
         </div>
       </main>
 
+      {/* Modal de carrito */}
       <CartModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         product={selectedProduct}
-        quantity={quantity}  // Pasamos la cantidad
-        setQuantity={setQuantity}  // Pasamos la función para cambiar la cantidad
+        quantity={quantity}
+        setQuantity={setQuantity}
         onAddToCart={handleAddToCart}
       />
-
     </div>
   );
 }

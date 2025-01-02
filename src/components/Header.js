@@ -9,18 +9,20 @@ export default function Header() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
-  const [loading, setLoading] = useState(true); // Estado de carga
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Obtener el usuario y su rol
   useEffect(() => {
     const fetchUser = async () => {
-      setLoading(true); // Asegúrate de establecer el estado de carga al inicio
+      setLoading(true);
       const { data, error } = await supabase.auth.getUser();
 
       if (error) {
         console.error('Error al obtener el usuario:', error);
       } else {
-        setUser(data.user); // Guardamos el usuario
+        setUser(data.user);
         if (data.user) {
           const { data: roleData, error: roleError } = await supabase
             .from('roles_usuarios')
@@ -30,11 +32,11 @@ export default function Header() {
           if (roleError) {
             console.error('Error al obtener el rol:', roleError);
           } else {
-            setRole(roleData?.rol_id); // Establece el rol
+            setRole(roleData?.rol_id);
           }
         }
       }
-      setLoading(false); // Marca como cargado después de obtener los datos
+      setLoading(false);
     };
 
     fetchUser();
@@ -42,9 +44,8 @@ export default function Header() {
 
   // Manejar el clic en el perfil
   const handleProfileClick = () => {
-    if (loading) return; // Evita que se ejecute la lógica de redirección mientras se carga
+    if (loading) return;
 
-    // Verificamos si el usuario está disponible y si tiene un rol asignado
     if (!user) {
       navigate('/register');
     } else if (!role) {
@@ -59,59 +60,200 @@ export default function Header() {
   // Función para cerrar sesión
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setUser(null); // Limpiamos el estado del usuario
-    setRole(null); // Limpiamos el estado del rol
-    navigate('/'); // Redirigimos a la página principal o home
+    setUser(null);
+    setRole(null);
+    navigate('/');
+  };
+
+  // Manejar el término de búsqueda
+  const handleSearch = () => {
+    if (searchTerm.trim()) {
+      navigate(`/search?query=${searchTerm}`);
+    }
   };
 
   return (
     <header className="bg-white shadow-sm">
       <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center gap-4">
-          <div className="text-2xl font-bold text-pink-600">PedidosFast</div>
-          <div className="flex-1 flex items-center gap-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="text-2xl font-bold text-pink-600">AppPedidos</div>
+
+          {/* Menú móvil */}
+          <div className="md:hidden flex items-center">
+            <button
+              className="text-gray-600 hover:text-gray-800"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <svg
+                className="h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {/* Elementos que solo se muestran en dispositivos grandes */}
+          <div className="hidden md:flex items-center gap-4 flex-1">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium">Enviar a</span>
-              <Button variant="ghost">Managua</Button>
+              <div className="flex items-center gap-1 hover:cursor-pointer">
+                <button className="text-sm font-medium text-blue-600 bg-transparent border-0 hover:text-blue-800 focus:outline-none">
+                  Managua
+                </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 text-blue-600"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 2C8.134 2 5 5.134 5 9c0 3.866 4 9 7 12 3-3 7-8.134 7-12 0-3.866-3.134-7-7-7z"></path>
+                  <circle cx="12" cy="9" r="3"></circle>
+                </svg>
+              </div>
             </div>
+
             <div className="flex-1 max-w-xl">
               <div className="relative">
-                <Input
+                <input
                   type="search"
-                  placeholder="Buscar locales"
-                  className="w-full pl-4 pr-10"
+                  placeholder="Buscar tiendas"
+                  className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-600"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                {/* SVG icon for search */}
+                <svg
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5 cursor-pointer"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  onClick={handleSearch}
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
               </div>
             </div>
           </div>
-          
-          {/* Condicionalmente mostrar "Iniciar sesión" o "Cerrar sesión" */}
-          {user ? (
-            <>
-              <button
-                variant="ghost"
-                onClick={handleProfileClick}
-                className="text-gray-600 hover:text-gray-800"
-              >
-                Mi Perfil
-              </button>
-              <button
-                onClick={handleLogout}
-                className="text-gray-600 hover:text-gray-800"
-              >
-                Cerrar sesión
-              </button>
-            </>
-          ) : (
-            <a
-              href="/login"
-              className="text-gray-600 hover:text-gray-800"
-            >
-              Iniciar sesión
-            </a>
-          )}
+
+          {/* Menú de perfil y logout (escondido en móviles) */}
+          <div className="hidden md:flex items-center gap-4">
+            {user ? (
+              <>
+                <button
+                  onClick={handleProfileClick}
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  Mi Perfil
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  Cerrar sesión
+                </button>
+              </>
+            ) : (
+              <a href="/login" className="text-gray-600 hover:text-gray-800">
+                Iniciar sesión
+              </a>
+            )}
+          </div>
         </div>
+
+        {/* Menú móvil (visible cuando se hace clic en el icono de hamburguesa) */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden flex flex-col gap-4 mt-4">
+            {/* Enviar a */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">Enviar a</span>
+              <div className="flex items-center gap-1 hover:cursor-pointer">
+                <button className="text-sm font-medium text-blue-600 bg-transparent border-0 hover:text-blue-800 focus:outline-none">
+                  Managua
+                </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 text-blue-600"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 2C8.134 2 5 5.134 5 9c0 3.866 4 9 7 12 3-3 7-8.134 7-12 0-3.866-3.134-7-7-7z"></path>
+                  <circle cx="12" cy="9" r="3"></circle>
+                </svg>
+              </div>
+            </div>
+
+            {/* Barra de búsqueda */}
+            <div className="relative">
+              <input
+                type="search"
+                placeholder="Buscar tiendas"
+                className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-600"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              />
+              <svg
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5 cursor-pointer"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                onClick={handleSearch}
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+
+            {/* Perfil o inicio de sesión */}
+            {user ? (
+              <>
+                <button
+                  onClick={handleProfileClick}
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  Mi Perfil
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  Cerrar sesión
+                </button>
+              </>
+            ) : (
+              <a href="/login" className="text-gray-600 hover:text-gray-800">
+                Iniciar sesión
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );

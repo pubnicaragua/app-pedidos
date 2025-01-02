@@ -12,7 +12,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Carrito from './pages/Carrito';
 import CreateProduct from './components/CreateProduct';
-import Search from './pages/Search';
+import Search from './components/Search'
 import CompletarPerfil from './pages/CompletarPerfil';
 import CrearTienda from './pages/auth/tienda/Crear';
 import PerfilUsuario from './pages/auth/usuarios/PerfilUsuario';
@@ -20,10 +20,13 @@ import CrearUsuario from './pages/auth/usuarios/Crear';
 import Tienda from './pages/auth/tienda/Tienda';
 
 import supabase from './api/supabase';
+import { CategoriesSidebar } from './components/CategoriesSidebar';
+import { RestaurantCard } from './components/RestaurantCard';
+import Footer from './components/Footer';
 
 const categories = [
   { name: 'Restaurantes', slug: 'restaurantes', image: '/placeholder.svg?height=200&width=300' },
-  { name: 'Market', slug: 'market', image: '/placeholder.svg?height=200&width=300' },
+  { name: 'Comida Rápida', slug: 'market', image: '/placeholder.svg?height=200&width=300' },
   { name: 'Mercados', slug: 'mercados', image: '/placeholder.svg?height=200&width=300' },
   { name: 'Café', slug: 'cafe', image: '/placeholder.svg?height=200&width=300' },
   { name: 'Salud', slug: 'salud', image: '/placeholder.svg?height=200&width=300' },
@@ -124,6 +127,12 @@ function App() {
               <PromotionList />
             </>
           } />
+          <Route path="/search" element={
+            <>
+              <Search />
+              
+            </>
+          } />
           <Route path="/admin" element={
             <div className="flex">
               <Sidebar />
@@ -146,6 +155,7 @@ function App() {
           <Route path="/admin/productos/crear" element={<CreateProduct />} />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }
