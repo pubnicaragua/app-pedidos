@@ -49,7 +49,7 @@ export default function Footer() {
   
           <div className="mt-12 pt-8 border-t border-pink-500">
             <p className="text-sm text-center">
-              PedidosYa © 2010-{new Date().getFullYear()}
+              AppPedidos © 2024-{new Date().getFullYear()}
             </p>
           </div>
         </div>
