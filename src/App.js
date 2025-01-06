@@ -17,12 +17,10 @@ import CompletarPerfil from './pages/CompletarPerfil';
 import CrearTienda from './pages/auth/tienda/Crear';
 import PerfilUsuario from './pages/auth/usuarios/PerfilUsuario';
 import CrearUsuario from './pages/auth/usuarios/Crear';
-import Tienda from './pages/auth/tienda/Tienda';
 
 import supabase from './api/supabase';
 import { CategoriesSidebar } from './components/CategoriesSidebar';
 import { RestaurantCard } from './components/RestaurantCard';
-import Footer from './components/Footer';
 
 const categories = [
   { name: 'Restaurantes', slug: 'restaurantes', image: '/placeholder.svg?height=200&width=300' },
@@ -148,14 +146,12 @@ function App() {
           {/* rutas protegidas */}
           <Route path="/completar-perfil" element={<CompletarPerfil />} />
           <Route path="/tienda/crear" element={<CrearTienda />} />
-          <Route path="/tienda/perfil" element={<Tienda />} />
           <Route path="/usuarios/crear" element={<CrearUsuario />} />
           <Route path="/usuarios/perfil" element={<PerfilUsuario />} />
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/admin/productos/crear" element={<CreateProduct />} />
         </Routes>
       </main>
-      <Footer />
     </div>
   );
 }

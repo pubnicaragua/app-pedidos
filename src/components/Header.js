@@ -3,6 +3,9 @@ import { Button } from './Button';
 import { Input } from './Input';
 import { Search } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import logo from '../assets/logo.jpg'
+
+
 import supabase from '../api/supabase';
 
 export default function Header() {
@@ -77,7 +80,7 @@ export default function Header() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
           <Link to="/">
-            <div className="text-2xl font-bold text-pink-600">AppPedidos</div>
+            <img src={logo} alt="AppPedidos Logo" className="h-12 w-auto" />
           </Link>
 
           {/* Menú móvil */}
@@ -109,7 +112,7 @@ export default function Header() {
               <span className="text-sm font-medium">Enviar a</span>
               <div className="flex items-center gap-1 hover:cursor-pointer">
                 <button className="text-sm font-medium text-blue-600 bg-transparent border-0 hover:text-blue-800 focus:outline-none">
-                  Managua
+                  Lima
                 </button>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -189,7 +192,7 @@ export default function Header() {
               <span className="text-sm font-medium">Enviar a</span>
               <div className="flex items-center gap-1 hover:cursor-pointer">
                 <button className="text-sm font-medium text-blue-600 bg-transparent border-0 hover:text-blue-800 focus:outline-none">
-                  Managua
+                  Lima
                 </button>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

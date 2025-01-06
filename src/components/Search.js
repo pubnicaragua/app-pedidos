@@ -14,7 +14,7 @@ export default function SearchPage() {
   const [selectedStore, setSelectedStore] = useState(null);
   const [restaurants, setRestaurants] = useState([]);
   const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState([]); // Carrito en el estado
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,6 +23,21 @@ export default function SearchPage() {
 
   const location = useLocation();
   const query = new URLSearchParams(location.search).get('query');
+
+  // Cargar carrito desde localStorage al montar el componente
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      setCart(JSON.parse(savedCart));
+    }
+  }, []);
+
+  // Guardar carrito en localStorage cada vez que se actualiza
+  useEffect(() => {
+    if (cart.length > 0) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+  }, [cart]);
 
   useEffect(() => {
     const fetchStores = async () => {
@@ -94,6 +109,18 @@ export default function SearchPage() {
     setIsModalOpen(false);
   };
 
+  const handleRemoveFromCart = (productId) => {
+    const updatedCart = cart.filter(item => item.id !== productId);
+    setCart(updatedCart);
+  };
+
+  const handleUpdateQuantity = (productId, newQuantity) => {
+    const updatedCart = cart.map(item =>
+      item.id === productId ? { ...item, cantidad: newQuantity } : item
+    );
+    setCart(updatedCart);
+  };
+
   const handleContinue = () => {
     console.log('Continuar con la compra');
   };
@@ -156,7 +183,12 @@ export default function SearchPage() {
 
           {/* Sidebar con resumen del carrito */}
           <div className="w-full md:w-72 mt-6 md:mt-0">
-            <CartSummary cart={cart} onContinue={handleContinue} />
+            <CartSummary
+              cart={cart}
+              onContinue={handleContinue}
+              onRemove={handleRemoveFromCart}
+              onUpdateQuantity={handleUpdateQuantity}
+            />
             <CategoriesSidebar />
           </div>
         </div>
