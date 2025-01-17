@@ -1,9 +1,19 @@
-
-import { Star } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import { Star } from "lucide-react";
 
 export function RestaurantCard({ restaurant }) {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/tiendas/${encodeURIComponent(restaurant.nombre)}`);
+  };
+
   return (
-    <div key={restaurant.id} className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow">
+    <div
+      key={restaurant.id}
+      className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer"
+      onClick={handleCardClick}
+    >
       <div className="flex items-start gap-4">
         <img
           src={restaurant.logo}
@@ -15,12 +25,14 @@ export function RestaurantCard({ restaurant }) {
             <div>
               <h3 className="font-semibold">{restaurant.nombre}</h3>
               <p className="text-sm text-gray-600">
-                {restaurant.precio_envio ? `Envío C$${restaurant.precio_envio}` : 'Envío no disponible'}
+                {restaurant.precio_envio
+                  ? `Envío C$${restaurant.precio_envio}`
+                  : "Envío no disponible"}
               </p>
             </div>
             <div className="flex items-center gap-1">
               <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              <span className="font-medium">{restaurant.calificacion || 'N/A'}</span>
+              <span className="font-medium">{restaurant.calificacion || "N/A"}</span>
             </div>
           </div>
         </div>
