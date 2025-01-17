@@ -17,6 +17,8 @@ import CompletarPerfil from './pages/CompletarPerfil';
 import CrearTienda from './pages/auth/tienda/Crear';
 import PerfilUsuario from './pages/auth/usuarios/PerfilUsuario';
 import CrearUsuario from './pages/auth/usuarios/Crear';
+import Tienda from './pages/Tienda';
+import PedidoResumen from './pages/PedidoResumen';
 
 import supabase from './api/supabase';
 import { CategoriesSidebar } from './components/CategoriesSidebar';
@@ -150,6 +152,8 @@ function App() {
           <Route path="/usuarios/perfil" element={<PerfilUsuario />} />
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/admin/productos/crear" element={<CreateProduct />} />
+          <Route path="/tiendas/:nombreTienda" element={<Tienda />} />
+          <Route path="/pedidos" element={<PedidoResumen />} />
         </Routes>
       </main>
     </div>
