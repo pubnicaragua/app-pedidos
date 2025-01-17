@@ -1,23 +1,24 @@
-import { useState } from 'react'
-import { Button } from "../ui/Button"
-import { Input } from "../ui/Input"
+import { useState } from 'react';
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "../ui/dialog"
+} from "../ui/dialog";
 
 export function AddToCartModal({ isOpen, onClose, product, onAddToCart }) {
-  const [quantity, setQuantity] = useState(1)
+  const [quantity, setQuantity] = useState(1);
 
-  if (!product) return null
+  if (!product) return null;
 
   const handleAddToCart = () => {
-    onAddToCart(product, quantity)
-    setQuantity(1)
-  }
+    onAddToCart(product, quantity); // Llama a la función con producto y cantidad
+    setQuantity(1); // Resetea la cantidad
+    onClose(); // Cierra el modal después de agregar al carrito
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -26,10 +27,10 @@ export function AddToCartModal({ isOpen, onClose, product, onAddToCart }) {
           <DialogTitle>Agregar al carrito</DialogTitle>
         </DialogHeader>
         <div className="flex items-center gap-4 my-4">
-          <img src={product.image} alt={product.name} className="w-16 h-16 object-cover rounded" />
+          <img src={product.imagen} alt={product.nombre} className="w-16 h-16 object-cover rounded" />
           <div>
-            <h3 className="font-semibold">{product.name}</h3>
-            <p className="text-sm text-gray-600">${product.price.toFixed(2)}</p>
+            <h3 className="font-semibold">{product.nombre}</h3>
+            <p className="text-sm text-gray-600">${product.precio.toFixed(2)}</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
@@ -55,6 +56,5 @@ export function AddToCartModal({ isOpen, onClose, product, onAddToCart }) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-

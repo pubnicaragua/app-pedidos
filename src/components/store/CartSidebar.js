@@ -1,13 +1,13 @@
 import { useState } from 'react'
-import { Button } from "../ui/Button"
-import { Input } from "../ui/Input"
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
 import { X } from 'lucide-react'
 
-export function CartSidebar({ cart, removeFromCart, updateCartItemQuantity }) {
-  const [isOpen, setIsOpen] = useState(false)
+export function CartSidebar({ cart, removeFromCart, updateCartItemQuantity, onCheckout }) {
+  const [isOpen, setIsOpen] = useState(false);
 
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0)
-  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = cart.reduce((sum, item) => sum + item.precio * item.quantity, 0);
 
   return (
     <>
@@ -19,9 +19,9 @@ export function CartSidebar({ cart, removeFromCart, updateCartItemQuantity }) {
           <div className="flex-grow overflow-y-auto p-4">
             {cart.map((item) => (
               <div key={item.id} className="flex items-center gap-2 mb-4">
-                <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded" />
+                <img src={item.imagen} alt={item.name} className="w-12 h-12 object-cover rounded" />
                 <div className="flex-grow">
-                  <h3 className="font-medium">{item.name}</h3>
+                  <h3 className="font-medium">{item.nombre}</h3>
                   <div className="flex items-center gap-2">
                     <Input
                       type="number"
@@ -30,7 +30,7 @@ export function CartSidebar({ cart, removeFromCart, updateCartItemQuantity }) {
                       onChange={(e) => updateCartItemQuantity(item.id, Math.max(1, parseInt(e.target.value)))}
                       className="w-16 h-8"
                     />
-                    <span className="text-sm">${(item.price * item.quantity).toFixed(2)}</span>
+                    <span className="text-sm">C${(item.precio * item.quantity).toFixed(2)}</span>
                   </div>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => removeFromCart(item.id)}>
@@ -44,7 +44,9 @@ export function CartSidebar({ cart, removeFromCart, updateCartItemQuantity }) {
               <span>Total:</span>
               <span className="font-semibold">${totalPrice.toFixed(2)}</span>
             </div>
-            <Button className="w-full">Realizar pedido</Button>
+            <Button className="w-full" onClick={onCheckout}>
+              Realizar pedido
+            </Button>
           </div>
         </div>
       </div>
@@ -63,6 +65,6 @@ export function CartSidebar({ cart, removeFromCart, updateCartItemQuantity }) {
         </button>
       )}
     </>
-  )
+  );
 }
 

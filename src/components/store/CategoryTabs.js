@@ -1,4 +1,4 @@
-import { Tabs, TabsList, TabsTrigger } from "../ui/Tabs"
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs"
 
 export function CategoryTabs({ categories, activeCategory, onCategoryChange }) {
   return (
