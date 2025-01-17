@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import supabase from '../api/supabase'; // Suponiendo que tienes supabase configurado
+import supabase from '../api/supabase'; 
 
 const Register = () => {
  // Estado para manejar los campos del formulario
