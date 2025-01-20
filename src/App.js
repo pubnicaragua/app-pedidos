@@ -19,6 +19,8 @@ import PerfilUsuario from './pages/auth/usuarios/PerfilUsuario';
 import CrearUsuario from './pages/auth/usuarios/Crear';
 import Tienda from './pages/Tienda';
 import PedidoResumen from './pages/PedidoResumen';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 import supabase from './api/supabase';
 import { CategoriesSidebar } from './components/CategoriesSidebar';
@@ -144,6 +146,8 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/search" element={<Search />} />
+          <Route path='/forgot-password' element={<ForgotPassword />} />
+          <Route path='/reset-password' element={<ResetPassword />} />
 
           {/* rutas protegidas */}
           <Route path="/completar-perfil" element={<CompletarPerfil />} />
