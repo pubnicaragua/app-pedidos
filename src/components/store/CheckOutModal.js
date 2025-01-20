@@ -1,11 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import guardarPedido from '../../api/cartFunctions'
 import supabase from "../../api/supabase";
 import { useNavigate } from 'react-router-dom';
-
 
 import {
   Dialog,
@@ -28,8 +26,54 @@ export function CheckoutModal({ isOpen, onClose, cart, onCompleteOrder }) {
   const [cardName, setCardName] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCVC, setCardCVC] = useState("");
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) throw error;
+
+        console.log('Usuario obtenido desde checkout:', data.user);
+        setUser(data.user);
+      } catch (error) {
+        console.error('Error al obtener el usuario:', error);
+      }
+    };
+
+    getUser();
+  }, []);
+
+  const guardarPedido = async ({ userId, metodoPago, productos, total }) => {
+    if (!userId) {
+      console.error("El ID del usuario no está definido. No se puede guardar el pedido.");
+      return { success: false, message: "ID de usuario no definido" };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('pedido')
+        .insert([
+          {
+            user_id: userId,
+            metodo_pago: metodoPago,
+            productos: productos,
+            total: total,
+          },
+        ]);
+
+      if (error) {
+        console.error('Error al guardar el pedido:', error.message);
+        return { success: false, message: error.message };
+      }
+
+      return { success: true, data };
+    } catch (err) {
+      console.error("Error inesperado al guardar el pedido:", err);
+      return { success: false, message: "Error inesperado al guardar el pedido" };
+    }
+  };
 
   const totalPrice = cart.reduce(
     (sum, item) => sum + item.precio * item.quantity,
@@ -39,8 +83,8 @@ export function CheckoutModal({ isOpen, onClose, cart, onCompleteOrder }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const user = supabase.auth.getUser(); // Obtén el usuario autenticado
-    if (!user) {
+    if (!user || !user.id) {
+      console.error("Usuario no autenticado o ID inválido.");
       alert("Debes iniciar sesión para realizar un pedido.");
       return;
     }
@@ -57,17 +101,18 @@ export function CheckoutModal({ isOpen, onClose, cart, onCompleteOrder }) {
       total: totalPrice,
     };
 
+    console.log("Datos del pedido antes de guardar:", pedido);
+
     const resultado = await guardarPedido(pedido);
-    if (resultado) {
-      console.log("Pedido guardado:", resultado);
-      navigate('/pedidos'); // Cambia history.push por navigate
+    if (resultado.success) {
+      console.log("Pedido guardado exitosamente:", resultado.data);
+      navigate('/pedidos');
       onCompleteOrder();
     } else {
-      alert("Hubo un error al guardar tu pedido. Inténtalo nuevamente.");
+      console.error("Error al guardar el pedido:", resultado.message);
+      alert(`Hubo un error al guardar tu pedido: ${resultado.message}`);
     }
   };
-
-
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
