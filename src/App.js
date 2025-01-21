@@ -18,9 +18,10 @@ import CrearTienda from './pages/auth/tienda/Crear';
 import PerfilUsuario from './pages/auth/usuarios/PerfilUsuario';
 import CrearUsuario from './pages/auth/usuarios/Crear';
 import Tienda from './pages/Tienda';
-import PedidoResumen from './pages/PedidoResumen';
+import ListaPedidos  from './pages/ListaPedidos';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import ResumenPedido from './pages/ResumenPedido';
 
 import supabase from './api/supabase';
 import { CategoriesSidebar } from './components/CategoriesSidebar';
@@ -157,7 +158,8 @@ function App() {
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/admin/productos/crear" element={<CreateProduct />} />
           <Route path="/tiendas/:nombreTienda" element={<Tienda />} />
-          <Route path="/pedidos" element={<PedidoResumen />} />
+          <Route path="/mis-pedidos" element={<ListaPedidos />} />
+          <Route path="/resumen-pedido" element={<ResumenPedido />} />
         </Routes>
       </main>
     </div>

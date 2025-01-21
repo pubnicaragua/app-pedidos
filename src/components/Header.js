@@ -163,6 +163,12 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-4">
             {user ? (
               <>
+              <button
+                  onClick={handleProfileClick}
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  <a href="/mis-pedidos">Pedidos</a>
+                </button>
                 <button
                   onClick={handleProfileClick}
                   className="text-gray-600 hover:text-gray-800"
@@ -239,6 +245,12 @@ export default function Header() {
             {/* Perfil o inicio de sesión */}
             {user ? (
               <>
+              <button
+                  onClick={handleProfileClick}
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  <a href="/mis-pedidos">Pedidos</a>
+                </button>
                 <button
                   onClick={handleProfileClick}
                   className="text-gray-600 hover:text-gray-800"
