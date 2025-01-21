@@ -11,7 +11,7 @@ export default function ListaPedidos() {
       setLoading(true);
       const { data, error } = await supabase
         .from("pedido")
-        .select("id, created_at, productos, total")
+        .select("id, created_at, productos, total, estado")
         .order("created_at", { ascending: false });
 
       if (error) {

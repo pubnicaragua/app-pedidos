@@ -1,193 +1,147 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+import { useLocation } from "react-router-dom"; // Importa useLocation
+import AddressAndLocationEditor from "../components/pedidos/AddressAndLocationEditor";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import supabase from "../api/supabase";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 
-export default function CheckoutPage({ cart = [], onCompleteOrder }) {
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const [cardDetails, setCardDetails] = useState({
-    cardNumber: "",
-    cardName: "",
-    cardExpiry: "",
-    cardCVC: "",
-  });
-  const [address, setAddress] = useState("");
-  const [location, setLocation] = useState(null);
-  const [totalPrice, setTotalPrice] = useState(0);
+export default function CheckoutPage() {
+    const [cart, setCart] = useState([]);
+    const [paymentMethod, setPaymentMethod] = useState("");
+    const [user, setUser] = useState(null);
+    const [observations, setObservations] = useState("");
 
-  useEffect(() => {
-    if (Array.isArray(cart)) {
-      const total = cart.reduce((sum, item) => sum + item.precio * item.quantity, 0);
-      setTotalPrice(total);
-    }
-  }, [cart]);
+    const location = useLocation(); // Usa useLocation para obtener el estado
+    const tiendaId = location.state?.tiendaId; // Obtén tiendaId del estado de navegación
 
-  const guardarPedido = async ({ userId, metodoPago, productos, total, direccion, ubicacion }) => {
-    try {
-      const { data, error } = await supabase
-        .from("pedido")
-        .insert([
-          {
-            user_id: userId,
-            metodo_pago: metodoPago,
-            productos: productos,
-            total: total,
-            direccion: direccion,
-            ubicacion: ubicacion,
-          },
-        ]);
 
-      if (error) throw error;
-      return { success: true, data };
-    } catch (error) {
-      console.error("Error al guardar el pedido:", error);
-      return { success: false, message: error.message };
-    }
-  };
+    const navigate = useNavigate();
 
-  const handleConfirmOrder = async () => {
-    const user = await supabase.auth.getUser();
+    useEffect(() => {
+        // Load cart from localStorage
+        const storedCart = localStorage.getItem("cart");
+        if (storedCart) {
+            setCart(JSON.parse(storedCart));
+        }
 
-    if (!user?.data?.user?.id) {
-      alert("Debes iniciar sesión para realizar un pedido.");
-      return;
-    }
+        // Get user data
+        const getUser = async () => {
+            try {
+                const { data, error } = await supabase.auth.getUser();
+                if (error) throw error;
+                setUser(data.user);
+            } catch (error) {
+                console.error("Error al obtener el usuario:", error);
+            }
+        };
 
-    const pedido = {
-      userId: user.data.user.id,
-      metodoPago: paymentMethod === "cash" ? "Pago contra entrega" : "Tarjeta",
-      productos: Array.isArray(cart)
-        ? cart.map((item) => ({
-            id: item.id,
-            nombre: item.nombre,
-            cantidad: item.quantity,
-            precio: item.precio,
-          }))
-        : [],
-      total: totalPrice,
-      direccion: address,
-      ubicacion: location,
+        getUser();
+    }, []);
+
+    const totalPrice = cart.reduce((sum, item) => sum + item.precio * item.quantity, 0);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!user || !user.id || !tiendaId) {
+            console.error("Usuario no autenticado o ID inválido.");
+            alert("Error: Falta información del usuario o tienda.");
+            return;
+        }
+
+        const pedido = {
+            user_id: user.id,
+            tienda_id: tiendaId,
+            metodo_pago: paymentMethod,
+            productos: cart.map((item) => ({
+                id: item.id,
+                nombre: item.nombre,
+                cantidad: item.quantity,
+                precio: item.precio,
+            })),
+            total: totalPrice,
+            observaciones: observations,
+            estado: "Pendiente", // Estado predeterminado
+        };
+
+        try {
+            const { data, error } = await supabase.from("pedido").insert([pedido]);
+
+            if (error) throw error;
+
+            console.log("Pedido guardado exitosamente:", data);
+            localStorage.removeItem("cart"); // Limpiar el carrito de localStorage
+            navigate("/mis-pedidos");
+        } catch (error) {
+            console.error("Error al guardar el pedido:", error.message);
+            alert(`Hubo un error al guardar tu pedido: ${error.message}`);
+        }
     };
 
-    const resultado = await guardarPedido(pedido);
-    if (resultado.success) {
-      onCompleteOrder();
-      alert("¡Pedido confirmado exitosamente!");
-    } else {
-      alert(`Error al confirmar el pedido: ${resultado.message}`);
-    }
-  };
 
-  function LocationSelector() {
-    useMapEvents({
-      click: (e) => {
-        setLocation([e.latlng.lat, e.latlng.lng]);
-      },
-    });
-    return location ? <Marker position={location} /> : null;
-  }
+    return (
+        <div className="container mx-auto px-4 py-8">
+            <h1 className="text-2xl font-bold mb-4">Resumen del pedido</h1>
 
-  return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow">
-      <h1 className="text-2xl font-bold mb-6">Revisar Pedido</h1>
-
-      {/* Resumen del pedido */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Resumen</h2>
-        {Array.isArray(cart) && cart.length > 0 ? (
-          <ul>
-            {cart.map((item) => (
-              <li key={item.id} className="flex justify-between border-b py-2">
-                <span>{item.nombre} (x{item.quantity})</span>
-                <span>${(item.precio * item.quantity).toFixed(2)}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No hay productos en el carrito.</p>
-        )}
-        <div className="flex justify-between font-bold mt-4">
-          <span>Total:</span>
-          <span>${totalPrice.toFixed(2)}</span>
-        </div>
-      </div>
-
-      {/* Método de pago */}
-      <div className="mb-6">
-        <Label>Método de pago</Label>
-        <Select onValueChange={setPaymentMethod} required>
-          <SelectTrigger>
-            <SelectValue placeholder="Selecciona un método de pago" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="credit">Tarjeta de crédito</SelectItem>
-            <SelectItem value="debit">Tarjeta de débito</SelectItem>
-            <SelectItem value="cash">Pago contra entrega</SelectItem>
-          </SelectContent>
-        </Select>
-        {paymentMethod !== "cash" && paymentMethod && (
-          <div className="mt-4 space-y-2">
-            <Input
-              placeholder="Número de tarjeta"
-              value={cardDetails.cardNumber}
-              onChange={(e) => setCardDetails({ ...cardDetails, cardNumber: e.target.value })}
-              required
-            />
-            <Input
-              placeholder="Nombre en la tarjeta"
-              value={cardDetails.cardName}
-              onChange={(e) => setCardDetails({ ...cardDetails, cardName: e.target.value })}
-              required
-            />
-            <div className="flex gap-2">
-              <Input
-                placeholder="MM/AA"
-                value={cardDetails.cardExpiry}
-                onChange={(e) => setCardDetails({ ...cardDetails, cardExpiry: e.target.value })}
-                required
-              />
-              <Input
-                placeholder="CVC"
-                value={cardDetails.cardCVC}
-                onChange={(e) => setCardDetails({ ...cardDetails, cardCVC: e.target.value })}
-                required
-              />
+            {/* Resumen del carrito */}
+            <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+                <h2 className="text-xl font-semibold mb-4">Artículos en el carrito</h2>
+                {cart.map((item) => (
+                    <div key={item.id} className="flex justify-between items-center mb-2">
+                        <span>{item.nombre} x {item.quantity}</span>
+                        <span>${(item.precio * item.quantity).toFixed(2)}</span>
+                    </div>
+                ))}
+                <div className="border-t pt-4 mt-4">
+                    <div className="flex justify-between items-center font-bold">
+                        <span>Total:</span>
+                        <span>${totalPrice.toFixed(2)}</span>
+                    </div>
+                </div>
             </div>
-          </div>
-        )}
-      </div>
 
-      {/* Dirección */}
-      <div className="mb-6">
-        <Label>Dirección de entrega</Label>
-        <Input
-          placeholder="Ingresa tu dirección"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          required
-        />
-      </div>
+            {/* Dirección y ubicación */}
+            {user && (
+                <div className="mb-6">
+                    <h2 className="text-xl font-semibold mb-4">Dirección y Ubicación</h2>
+                    <AddressAndLocationEditor userId={user.id} />
+                </div>
+            )}
 
-      {/* Ubicación en el mapa */}
-      <div className="mb-6">
-        <Label>Selecciona tu ubicación en el mapa</Label>
-        <MapContainer
-          center={[12.114992, -86.236174]} // Centro inicial
-          zoom={13}
-          style={{ height: "300px", width: "100%" }}
-        >
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <LocationSelector />
-        </MapContainer>
-      </div>
+            {/* Formulario de método de pago */}
+            <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6">
+                <h2 className="text-xl font-semibold mb-4">Método de pago</h2>
+                <div className="mb-4">
+                    <Label htmlFor="payment-method">Selecciona un método de pago</Label>
+                    <Select onValueChange={setPaymentMethod} required>
+                        <SelectTrigger id="payment-method">
+                            <SelectValue placeholder="Selecciona un método de pago" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Tarjeta de crédito">Tarjeta de crédito</SelectItem>
+                            <SelectItem value="Tarjeta de débito">Tarjeta de débito</SelectItem>
+                            <SelectItem value="Pago contra entrega">Pago contra entrega</SelectItem>
+                        </SelectContent>
+                    </Select>
 
-      <Button className="w-full" onClick={handleConfirmOrder}>
-        Confirmar pedido
-      </Button>
-    </div>
-  );
+                </div>
+                <div className="mb-4">
+                    <Label htmlFor="observations">Observaciones</Label>
+                    <Input
+                        id="observations"
+                        value={observations}
+                        onChange={(e) => setObservations(e.target.value)}
+                        placeholder="Agrega cualquier observación sobre tu pedido"
+                        className="mt-1"
+                    />
+                </div>
+                <Button type="submit" className="w-full">
+                    Confirmar pedido
+                </Button>
+            </form>
+        </div>
+    );
 }

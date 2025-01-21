@@ -31,8 +31,8 @@ export default function Tienda() {
     }
   });
 
-   // Sincronizar carrito con localStorage
-   useEffect(() => {
+  // Sincronizar carrito con localStorage
+  useEffect(() => {
     try {
       localStorage.setItem("cart", JSON.stringify(cart));
     } catch (error) {
@@ -60,6 +60,7 @@ export default function Tienda() {
       const { data, error } = await supabase
         .from("tienda")
         .select(`
+          id,
           nombre,
           calificacion,
           productos (
@@ -79,6 +80,7 @@ export default function Tienda() {
         console.error("Error fetching tienda data:", error);
       } else {
         setTiendaData({
+          id: data.id,
           nombre: data.nombre,
           calificacion: data.calificacion,
         });
@@ -95,7 +97,7 @@ export default function Tienda() {
 
   if (loading) return <div>Cargando...</div>;
   if (!tiendaData) return <div>No se encontró la tienda.</div>;
-
+  console.log("Tienda ID en Tienda.jsx:", tiendaData.id);
 
 
   const openAddToCartModal = (product) => {
@@ -135,18 +137,18 @@ export default function Tienda() {
     );
   };
 
-  const openCheckoutModal = () => {
-    setIsCheckoutModalOpen(true)
-  }
+  // const openCheckoutModal = () => {
+  //   setIsCheckoutModalOpen(true)
+  // }
 
-  const closeCheckoutModal = () => {
-    setIsCheckoutModalOpen(false)
-  }
+  // const closeCheckoutModal = () => {
+  //   setIsCheckoutModalOpen(false)
+  // }
 
-  const completeOrder = () => {
-    console.log("Pedido completado:", cart);
-    setCart([]); // Limpia el carrito tras finalizar el pedido
-  };
+  // const completeOrder = () => {
+  //   console.log("Pedido completado:", cart);
+  //   setCart([]); // Limpia el carrito tras finalizar el pedido
+  // };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -166,13 +168,18 @@ export default function Tienda() {
             }}
           />
         </main>
+
       </div>
+
       <CartSidebar
+
         cart={cart}
         removeFromCart={removeFromCart}
         updateCartItemQuantity={updateCartItemQuantity}
         onCheckout={() => setIsCheckoutModalOpen(true)}
+        tiendaId={tiendaData?.id} // Asegúrate de pasar correctamente el ID de la tienda
       />
+
       <AddToCartModal
         isOpen={isAddToCartModalOpen}
         onClose={() => setIsAddToCartModalOpen(false)}
@@ -182,12 +189,12 @@ export default function Tienda() {
           setIsAddToCartModalOpen(false);
         }}
       />
-      <CheckoutModal
+      {/* <CheckoutModal
         isOpen={isCheckoutModalOpen}
         onClose={() => setIsCheckoutModalOpen(false)}
         cart={cart}
         onCompleteOrder={completeOrder}
-      />
+      /> */}
     </div>
   );
 }
