@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { X } from 'lucide-react'
+import { useNavigate } from "react-router-dom"
 
-export function CartSidebar({ cart, removeFromCart, updateCartItemQuantity, onCheckout }) {
+export function CartSidebar({ cart, removeFromCart, updateCartItemQuantity, tiendaId }) {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate()
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cart.reduce((sum, item) => sum + item.precio * item.quantity, 0);
@@ -44,9 +46,17 @@ export function CartSidebar({ cart, removeFromCart, updateCartItemQuantity, onCh
               <span>Total:</span>
               <span className="font-semibold">${totalPrice.toFixed(2)}</span>
             </div>
-            <Button className="w-full" onClick={onCheckout}>
+            <Button
+              className="w-full"
+              onClick={() => {
+                console.log("Tienda ID en CartSidebar:", tiendaId);
+                navigate("/resumen-pedido", { state: { tiendaId } });
+              }}
+            >
               Realizar pedido
             </Button>
+
+
           </div>
         </div>
       </div>
