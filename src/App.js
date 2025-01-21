@@ -22,6 +22,7 @@ import ListaPedidos  from './pages/ListaPedidos';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import ResumenPedido from './pages/ResumenPedido';
+import PedidoDetallePage from './pages/PedidoDetallePage';
 
 import supabase from './api/supabase';
 import { CategoriesSidebar } from './components/CategoriesSidebar';
@@ -159,6 +160,7 @@ function App() {
           <Route path="/admin/productos/crear" element={<CreateProduct />} />
           <Route path="/tiendas/:nombreTienda" element={<Tienda />} />
           <Route path="/mis-pedidos" element={<ListaPedidos />} />
+          <Route path="/mis-pedidos/:id" element={<PedidoDetallePage />} />
           <Route path="/resumen-pedido" element={<ResumenPedido />} />
         </Routes>
       </main>
