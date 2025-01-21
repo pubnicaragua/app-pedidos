@@ -106,7 +106,7 @@ export function CheckoutModal({ isOpen, onClose, cart, onCompleteOrder }) {
     const resultado = await guardarPedido(pedido);
     if (resultado.success) {
       console.log("Pedido guardado exitosamente:", resultado.data);
-      navigate('/pedidos');
+      navigate('/mis-pedidos');
       onCompleteOrder();
     } else {
       console.error("Error al guardar el pedido:", resultado.message);
