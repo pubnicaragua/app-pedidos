@@ -1,13 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { addToCart, updateCartItemQuantity, removeFromCart } from '../api/cartFunctions';
 
 import { SearchFilters } from "./SearchFilters";
-import { ProductCard } from "./ProductCard";
 import { RestaurantCard } from "./RestaurantCard";
 import { CategoriesSidebar } from "./CategoriesSidebar";
-import { CartModal } from "./CartModal";
-import { CartSummary } from "./CartSummary";
 import supabase from '../api/supabase'; // Asegúrate de que tienes supabase correctamente configurado
 
 export default function SearchPage() {
@@ -153,18 +149,7 @@ export default function SearchPage() {
                   Volver a las tiendas
                 </button>
                 <h2 className="text-lg font-semibold mb-4">{selectedStore.nombre}</h2>
-                <div className="space-y-4">
-                  {/* Mostrar productos de la tienda seleccionada */}
-                  {products && products.length > 0 ? (
-                    products.map((product) => (
-                      <div key={product.id} onClick={() => handleOpenModal(product)}>
-                        <ProductCard product={product} />
-                      </div>
-                    ))
-                  ) : (
-                    <div>No hay productos disponibles.</div>
-                  )}
-                </div>
+
               </div>
             ) : (
               <div>
@@ -183,26 +168,11 @@ export default function SearchPage() {
 
           {/* Sidebar con resumen del carrito */}
           <div className="w-full md:w-72 mt-6 md:mt-0">
-            <CartSummary
-              cart={cart}
-              onContinue={handleContinue}
-              onRemove={handleRemoveFromCart}
-              onUpdateQuantity={handleUpdateQuantity}
-            />
+
             <CategoriesSidebar />
           </div>
         </div>
       </main>
-
-      {/* Modal de carrito */}
-      <CartModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        product={selectedProduct}
-        quantity={quantity}
-        setQuantity={setQuantity}
-        onAddToCart={handleAddToCart}
-      />
     </div>
   );
 }
