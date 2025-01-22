@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 import { SearchFilters } from "./SearchFilters";
 import { RestaurantCard } from "./RestaurantCard";
@@ -17,6 +17,7 @@ export default function SearchPage() {
   const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState(null);
 
+  const { category: categoryId } = useParams(); // `categoryId` será el ID numérico // Captura la categoría desde la URL dinámica
   const location = useLocation();
   const query = new URLSearchParams(location.search).get('query');
 
@@ -36,28 +37,37 @@ export default function SearchPage() {
   }, [cart]);
 
   useEffect(() => {
-    const fetchStores = async () => {
+    const fetchStoresOrProducts = async () => {
       try {
         setLoading(true);
-
-        const { data, error } = await supabase
-          .rpc('search_stores_by_category', { query })
-          .select('*');
-
+        let data, error;
+  
+        if (categoryId) {
+          // Consulta por categoría
+          ({ data, error } = await supabase
+            .from("tienda")
+            .select("*")
+            .eq("categoria_id", categoryId));
+        } else if (query) {
+          // Consulta por búsqueda de productos o tiendas
+          ({ data, error } = await supabase
+            .rpc("search_stores_by_category", { query }));
+        }
+  
         if (error) throw error;
-
-        setRestaurants(data);
+  
+        setRestaurants(data); // Almacena los resultados
       } catch (error) {
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
+  
+    fetchStoresOrProducts();
+  }, [categoryId, query]);
+  
 
-    if (query) {
-      fetchStores();
-    }
-  }, [query]);
 
   useEffect(() => {
     if (selectedStore) {
@@ -85,40 +95,6 @@ export default function SearchPage() {
 
   const handleStoreClick = (store) => {
     setSelectedStore(store);
-  };
-
-  const handleOpenModal = (product) => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
-  };
-
-  const handleAddToCart = (product) => {
-    const existingProductIndex = cart.findIndex(item => item.id === product.id);
-
-    if (existingProductIndex !== -1) {
-      const updatedCart = [...cart];
-      updatedCart[existingProductIndex].cantidad += quantity;
-      setCart(updatedCart);
-    } else {
-      setCart([...cart, { ...product, cantidad: quantity }]);
-    }
-    setIsModalOpen(false);
-  };
-
-  const handleRemoveFromCart = (productId) => {
-    const updatedCart = cart.filter(item => item.id !== productId);
-    setCart(updatedCart);
-  };
-
-  const handleUpdateQuantity = (productId, newQuantity) => {
-    const updatedCart = cart.map(item =>
-      item.id === productId ? { ...item, cantidad: newQuantity } : item
-    );
-    setCart(updatedCart);
-  };
-
-  const handleContinue = () => {
-    console.log('Continuar con la compra');
   };
 
   if (loading) {
@@ -155,20 +131,17 @@ export default function SearchPage() {
               <div>
                 <h2 className="text-lg font-semibold mb-4">Restaurantes</h2>
                 <div className="space-y-4">
-                  {/* Mostrar restaurantes */}
                   {restaurants.map((restaurant) => (
-                    <div key={restaurant.id} onClick={() => handleStoreClick(restaurant)}>
-                      <RestaurantCard restaurant={restaurant} />
-                    </div>
+                    <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                   ))}
                 </div>
               </div>
+
             )}
           </div>
 
           {/* Sidebar con resumen del carrito */}
           <div className="w-full md:w-72 mt-6 md:mt-0">
-
             <CategoriesSidebar />
           </div>
         </div>

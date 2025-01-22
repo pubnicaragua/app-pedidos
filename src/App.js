@@ -18,7 +18,7 @@ import CrearTienda from './pages/auth/tienda/Crear';
 import PerfilUsuario from './pages/auth/usuarios/PerfilUsuario';
 import CrearUsuario from './pages/auth/usuarios/Crear';
 import Tienda from './pages/Tienda';
-import ListaPedidos  from './pages/ListaPedidos';
+import ListaPedidos from './pages/ListaPedidos';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import ResumenPedido from './pages/ResumenPedido';
@@ -134,9 +134,10 @@ function App() {
           <Route path="/search" element={
             <>
               <Search />
-              
+
             </>
           } />
+          <Route path="/category/:category" element={<Search />} />
           <Route path="/admin" element={
             <div className="flex">
               <Sidebar />

@@ -46,18 +46,19 @@ export default function CategoryList() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {categories.map((category) => (
           <Link
-            key={category.id}  // Usamos "id" como clave única
-            to={`/category/${category.nombre.toLowerCase().replace(/\s+/g, '-')}`}  // Crear URL dinámica
             className="relative overflow-hidden rounded-lg aspect-[4/3] group"
+            key={category.id}
+            to={`/category/${category.id}`} // URL dinámica
           >
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60" />
             <img
-              src={category.imagen}  // Usamos la URL de la imagen desde la base de datos
+              src={category.imagen}
               alt={category.nombre}
               className="object-cover w-full h-full"
             />
             <span className="absolute bottom-3 left-3 text-white font-medium">{category.nombre}</span>
           </Link>
+
         ))}
       </div>
     </section>
