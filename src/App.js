@@ -10,13 +10,11 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './components/DashboardStats';
 import Register from './pages/Register';
 import Login from './pages/Login';
-import Carrito from './pages/Carrito';
-import CreateProduct from './components/CreateProduct';
+
 import Search from './components/Search'
 import CompletarPerfil from './pages/CompletarPerfil';
-import CrearTienda from './pages/auth/tienda/Crear';
-import PerfilUsuario from './pages/auth/usuarios/PerfilUsuario';
-import CrearUsuario from './pages/auth/usuarios/Crear';
+import CrearTienda from './pages/tienda/Crear';
+import PerfilUsuario from './pages/PerfilUsuario';
 import Tienda from './pages/Tienda';
 import ListaPedidos from './pages/ListaPedidos';
 import ForgotPassword from './pages/ForgotPassword';
@@ -24,18 +22,10 @@ import ResetPassword from './pages/ResetPassword';
 import ResumenPedido from './pages/ResumenPedido';
 import PedidoDetallePage from './pages/PedidoDetallePage';
 
+
 import supabase from './api/supabase';
 import { CategoriesSidebar } from './components/CategoriesSidebar';
 import { RestaurantCard } from './components/RestaurantCard';
-
-const categories = [
-  { name: 'Restaurantes', slug: 'restaurantes', image: '/placeholder.svg?height=200&width=300' },
-  { name: 'Comida Rápida', slug: 'market', image: '/placeholder.svg?height=200&width=300' },
-  { name: 'Mercados', slug: 'mercados', image: '/placeholder.svg?height=200&width=300' },
-  { name: 'Café', slug: 'cafe', image: '/placeholder.svg?height=200&width=300' },
-  { name: 'Salud', slug: 'salud', image: '/placeholder.svg?height=200&width=300' },
-  { name: 'Mascotas', slug: 'mascotas', image: '/placeholder.svg?height=200&width=300' },
-];
 
 const suggestions = [
   { name: 'Restaurant 1', slug: 'restaurant-1', logo: '/placeholder.svg?height=200&width=200', deliveryFee: 9 },
@@ -99,7 +89,7 @@ function App() {
         navigate('/completar-perfil');
       }
     } else if (redirectTo) {
-      navigate(redirectTo);  // Redirige a la página original después de completar el perfil
+      navigate(redirectTo); 
     }
   }, [role, navigate, location, redirectTo, loading, user]);
 
@@ -107,7 +97,7 @@ function App() {
     return (
       <div className="loading-screen">
         <ClipLoader color="#3498db" loading={loading} size={50} />
-      </div>  // Aquí puedes agregar un spinner o un mensaje de carga
+      </div> 
     );
   }
 
@@ -126,7 +116,7 @@ function App() {
         <Routes>
           <Route path="/" element={
             <>
-              <CategoryList categories={categories} />
+              <CategoryList />
               <SuggestionList suggestions={suggestions} />
               <PromotionList />
             </>
@@ -155,10 +145,8 @@ function App() {
           {/* rutas protegidas */}
           <Route path="/completar-perfil" element={<CompletarPerfil />} />
           <Route path="/tienda/crear" element={<CrearTienda />} />
-          <Route path="/usuarios/crear" element={<CrearUsuario />} />
           <Route path="/usuarios/perfil" element={<PerfilUsuario />} />
-          <Route path="/carrito" element={<Carrito />} />
-          <Route path="/admin/productos/crear" element={<CreateProduct />} />
+          
           <Route path="/tiendas/:nombreTienda" element={<Tienda />} />
           <Route path="/mis-pedidos" element={<ListaPedidos />} />
           <Route path="/mis-pedidos/:id" element={<PedidoDetallePage />} />
