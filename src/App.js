@@ -115,13 +115,13 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       <Header user={user} role={role} />
       <main className="container mx-auto px-4 py-8">
-        {user && (
+        {/* {user && (
           <div className="text-xl font-semibold">
             <p>
               ¡Hola, {role ? `Rol: ${role}` : 'Usuario sin rol'}!
             </p>
           </div>
-        )}
+        )} */}
 
         <Routes>
           <Route path="/" element={
