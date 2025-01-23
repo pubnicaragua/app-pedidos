@@ -10,6 +10,7 @@ import Sidebar from './components/Sidebar';
 import Dashboard from './components/DashboardStats';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import TiendaDashboard from './pages/tienda/dashboard/Dashboard';
 
 import Search from './components/Search'
 import CompletarPerfil from './pages/CompletarPerfil';
@@ -151,6 +152,7 @@ function App() {
           <Route path="/mis-pedidos" element={<ListaPedidos />} />
           <Route path="/mis-pedidos/:id" element={<PedidoDetallePage />} />
           <Route path="/resumen-pedido" element={<ResumenPedido />} />
+          <Route path="/tienda/dashboard" element={<TiendaDashboard />} />
         </Routes>
       </main>
     </div>
