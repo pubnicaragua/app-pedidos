@@ -22,7 +22,9 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import ResumenPedido from './pages/ResumenPedido';
 import PedidoDetallePage from './pages/PedidoDetallePage';
-
+import PersonalizarTienda from './pages/tienda/dashboard/Personalizar';
+import ProductosPage from './pages/tienda/dashboard/Productos';
+import PedidosPage from './pages/tienda/dashboard/Pedidos';
 
 import supabase from './api/supabase';
 import { CategoriesSidebar } from './components/CategoriesSidebar';
@@ -153,6 +155,9 @@ function App() {
           <Route path="/mis-pedidos/:id" element={<PedidoDetallePage />} />
           <Route path="/resumen-pedido" element={<ResumenPedido />} />
           <Route path="/tienda/dashboard" element={<TiendaDashboard />} />
+          <Route path="/tienda/dashboard/personalizar" element={<PersonalizarTienda />} />
+          <Route path="/tienda/dashboard/productos" element={<ProductosPage />} />
+          <Route path="/tienda/dashboard/pedidos" element={<PedidosPage />} />
         </Routes>
       </main>
     </div>
