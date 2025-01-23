@@ -9,17 +9,17 @@ export default function DashboardLayout({ children }) {
         <h1 className="text-2xl font-bold">Dashboard de la Tienda</h1>
         <div className="flex gap-4">
           <Button className="flex items-center" variant="ghost">
-            <a href="/dashboard" className="flex items-center">
+            <a href="/tienda/dashboard/personalizar" className="flex items-center">
               <Paintbrush className="mr-2" /> Personalizar Tienda
             </a>
           </Button>
           <Button className="flex items-center" variant="ghost">
-            <a href="/dashboard/productos" className="flex items-center">
+            <a href="/tienda/dashboard/productos" className="flex items-center">
               <Package className="mr-2" /> Productos
             </a>
           </Button>
           <Button className="flex items-center" variant="ghost">
-            <a href="/dashboard/pedidos" className="flex items-center">
+            <a href="/tienda/dashboard/pedidos" className="flex items-center">
               <ShoppingBag className="mr-2" /> Pedidos
             </a>
           </Button>
