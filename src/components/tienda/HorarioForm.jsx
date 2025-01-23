@@ -1,4 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { Checkbox } from "../../components/ui/checkbox";
+import { Label } from "../../components/ui/label";
+import { Input } from "../../components/ui/input";
 
 export default function HorarioForm({ horarios, onHorarioChange }) {
   const handleChange = (index, field, value) => {
@@ -6,33 +10,47 @@ export default function HorarioForm({ horarios, onHorarioChange }) {
   };
 
   return (
-    <div>
-      <h3 className="text-sm font-medium text-gray-700">Horario de Atención</h3>
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Horario de Atención</h3>
       {horarios.map((horario, index) => (
-        <div key={horario.dia} className="flex items-center space-x-2 mb-2">
-          <input
-            type="checkbox"
+        <div key={horario.dia} className="flex items-center space-x-4">
+          <Checkbox
+            id={`active-${horario.dia}`}
             checked={horario.activo}
-            onChange={(e) => handleChange(index, 'activo', e.target.checked)}
+            onCheckedChange={(checked) => handleChange(index, 'activo', checked)}
           />
-          <span className="w-24">{horario.dia}</span>
-          <input
-            type="time"
-            value={horario.apertura}
-            onChange={(e) => handleChange(index, 'apertura', e.target.value)}
-            disabled={!horario.activo}
-            className="p-1 border border-gray-300 rounded"
-          />
-          <span>a</span>
-          <input
-            type="time"
-            value={horario.cierre}
-            onChange={(e) => handleChange(index, 'cierre', e.target.value)}
-            disabled={!horario.activo}
-            className="p-1 border border-gray-300 rounded"
-          />
+          <Label htmlFor={`active-${horario.dia}`} className="w-24 font-medium">
+            {horario.dia}
+          </Label>
+          <div className="flex items-center space-x-2">
+            <Input
+              type="time"
+              value={horario.apertura}
+              onChange={(e) => handleChange(index, 'apertura', e.target.value)}
+              disabled={!horario.activo}
+              className="w-32"
+            />
+            <span>a</span>
+            <Input
+              type="time"
+              value={horario.cierre}
+              onChange={(e) => handleChange(index, 'cierre', e.target.value)}
+              disabled={!horario.activo}
+              className="w-32"
+            />
+          </div>
         </div>
       ))}
     </div>
   );
 }
+
+HorarioForm.propTypes = {
+  horarios: PropTypes.arrayOf(PropTypes.shape({
+    dia: PropTypes.string.isRequired,
+    apertura: PropTypes.string.isRequired,
+    cierre: PropTypes.string.isRequired,
+    activo: PropTypes.bool.isRequired,
+  })).isRequired,
+  onHorarioChange: PropTypes.func.isRequired,
+};
