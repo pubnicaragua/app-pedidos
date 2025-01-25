@@ -3,9 +3,9 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 
 import Header from './components/Header';
-import CategoryList from './components/home/CategoryList';
-import SuggestionList from './components/home/SuggestionList';
-import PromotionList from './components/home/PromotionList';
+import CategoryList from './components/CategoryList'; // Importamos el componente CategoryList
+import SuggestionList from './components/SuggestionList';
+import PromotionList from './components/PromotionList';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/DashboardStats';
 import Register from './pages/Register';
