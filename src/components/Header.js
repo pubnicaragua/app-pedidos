@@ -183,7 +183,7 @@ export default function Header() {
                 </button>
               </>
             ) : (
-              <a href="/auth/login" className="text-gray-600 hover:text-gray-800">
+              <a href="/login" className="text-gray-600 hover:text-gray-800">
                 Iniciar sesión
               </a>
             )}
@@ -265,7 +265,7 @@ export default function Header() {
                 </button>
               </>
             ) : (
-              <a href="/auth/login" className="text-gray-600 hover:text-gray-800">
+              <a href="/login" className="text-gray-600 hover:text-gray-800">
                 Iniciar sesión
               </a>
             )}
