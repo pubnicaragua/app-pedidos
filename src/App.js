@@ -3,9 +3,9 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 
 import Header from './components/Header';
-import CategoryList from './components/CategoryList';
-import SuggestionList from './components/SuggestionList';
-import PromotionList from './components/PromotionList';
+import CategoryList from './components/home/CategoryList';
+import SuggestionList from './components/home/SuggestionList';
+import PromotionList from './components/home/PromotionList';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/DashboardStats';
 import Register from './pages/Register';
@@ -15,6 +15,7 @@ import TiendaDashboard from './pages/tienda/dashboard/Dashboard';
 import Search from './components/Search'
 import CompletarPerfil from './pages/CompletarPerfil';
 import CrearTienda from './pages/tienda/Crear';
+import CrearUsuario from './pages/usuarios/Crear';
 import PerfilUsuario from './pages/PerfilUsuario';
 import Tienda from './pages/Tienda';
 import ListaPedidos from './pages/ListaPedidos';
@@ -148,6 +149,7 @@ function App() {
           {/* rutas protegidas */}
           <Route path="/completar-perfil" element={<CompletarPerfil />} />
           <Route path="/tienda/crear" element={<CrearTienda />} />
+          <Route path="/usuarios/crear" element={<CrearUsuario />} />
           <Route path="/usuarios/perfil" element={<PerfilUsuario />} />
           
           <Route path="/tiendas/:nombreTienda" element={<Tienda />} />
