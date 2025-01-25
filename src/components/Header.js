@@ -3,8 +3,7 @@ import { Button } from '../components/ui/button';
 import { Input } from './Input';
 import { Search } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
-import logo from '../assets/logo.jpg'
-
+import logo from '../assets/logo.jpg';
 
 import supabase from '../api/supabase';
 
@@ -56,7 +55,7 @@ export default function Header() {
     } else if (role === 2) {
       navigate('/usuarios/perfil');
     } else if (role === 3) {
-      navigate('/tienda/perfil');
+      navigate('/tienda/dashboard');
     }
   };
 
@@ -163,18 +162,27 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-4">
             {user ? (
               <>
-              <button
-                  onClick={handleProfileClick}
-                  className="text-gray-600 hover:text-gray-800"
-                >
-                  <a href="/mis-pedidos">Pedidos</a>
-                </button>
                 <button
-                  onClick={handleProfileClick}
+                  onClick={() => navigate('/mis-pedidos')}
                   className="text-gray-600 hover:text-gray-800"
                 >
-                  Mi Perfil
+                  Pedidos
                 </button>
+                {role === 3 ? (
+                  <button
+                    onClick={() => navigate('/tienda/dashboard')}
+                    className="text-gray-600 hover:text-gray-800"
+                  >
+                    Mi Tienda
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleProfileClick}
+                    className="text-gray-600 hover:text-gray-800"
+                  >
+                    Mi Perfil
+                  </button>
+                )}
                 <button
                   onClick={handleLogout}
                   className="text-gray-600 hover:text-gray-800"
@@ -245,18 +253,27 @@ export default function Header() {
             {/* Perfil o inicio de sesión */}
             {user ? (
               <>
-              <button
-                  onClick={handleProfileClick}
-                  className="text-gray-600 hover:text-gray-800"
-                >
-                  <a href="/mis-pedidos">Pedidos</a>
-                </button>
                 <button
-                  onClick={handleProfileClick}
+                  onClick={() => navigate('/mis-pedidos')}
                   className="text-gray-600 hover:text-gray-800"
                 >
-                  Mi Perfil
+                  Pedidos
                 </button>
+                {role === 3 ? (
+                  <button
+                    onClick={() => navigate('/tienda/dashboard')}
+                    className="text-gray-600 hover:text-gray-800"
+                  >
+                    Mi Tienda
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleProfileClick}
+                    className="text-gray-600 hover:text-gray-800"
+                  >
+                    Mi Perfil
+                  </button>
+                )}
                 <button
                   onClick={handleLogout}
                   className="text-gray-600 hover:text-gray-800"
